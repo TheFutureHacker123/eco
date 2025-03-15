@@ -1,0 +1,282 @@
+import React, { useState } from "react";
+import {
+  Container,
+  Row,
+  Col,
+  Image,
+  Modal,
+  ListGroup,
+  Button,
+  Navbar,
+  Nav,
+  Dropdown,
+  Form,
+  Card,
+} from "react-bootstrap";
+import { Link } from "react-router-dom";
+import {
+  FaTachometerAlt,
+  FaEnvelope,
+  FaPen,
+  FaTimes,
+  FaClipboardList,
+  FaShoppingCart,
+  FaStar,
+  FaUser,
+  FaAddressBook,
+  FaSignOutAlt,
+  FaBars,
+  FaCog,
+  FaPlus,
+  FaTag,
+  FaTruck,
+  FaUndo,
+  FaCheck,
+  FaComment,
+  FaBell,
+  FaUserCog,
+} from "react-icons/fa";
+import "./style.css";
+
+function AddCoupons() {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [productManagementOpen, setProductManagementOpen] = useState(false);
+  const [orderManagementOpen, setOrderManagementOpen] = useState(false);
+  const [messageManagementOpen, setMessageManagementOpen] = useState(false);
+  const [accountSettingOpen, setAccountSettingOpen] = useState(false);
+  const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [amountType, setAmountType] = useState("$");
+  const [amount, setAmount] = useState("");
+  const [entries, setEntries] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handleAmountTypeChange = (e) => setAmountType(e.target.value);
+  const handleAmountChange = (e) => {
+    const value = e.target.value;
+    if (amountType === "%" && value > 100) return;
+    setAmount(value);
+  };
+
+  const toggleProductManagement = () =>
+    setProductManagementOpen(!productManagementOpen);
+  const toggleOrderManagement = () =>
+    setOrderManagementOpen(!orderManagementOpen);
+  const toggleMessageManagement = () =>
+    setMessageManagementOpen(!messageManagementOpen);
+  const toggleAccountSetting = () =>
+    setAccountSettingOpen(!accountSettingOpen);
+
+  const coupons = Array.from({ length: 20 }, (_, i) => ({
+    id: i + 1,
+    name: `Coupon ${i + 1}`,
+    code: `C${i + 1}01`,
+    image: "https://www.beyiddondolo.com/media/5679-84.jpg",
+    amount: `$${(i + 1) * 5}`,
+    expiryDate: `2025-03-${(i % 31) + 1}`,
+    status: i % 2 === 0,
+  }));
+
+  const totalPages = Math.ceil(coupons.length / entries);
+  const displayedCoupons = coupons.slice(
+    (currentPage - 1) * entries,
+    currentPage * entries
+  );
+
+  return (
+    <Container fluid>
+      {/* Top Navbar */}
+      <Navbar bg="dark" variant="dark" expand="lg" className="px-3 w-100 fixed-top">
+        <Button variant="dark" className="me-3 d-block" onClick={() => setSidebarOpen(!sidebarOpen)}>
+          <FaBars />
+        </Button>
+        <Navbar.Brand>WALIYA MARKET</Navbar.Brand>
+        <Nav className="ms-auto">
+          <Dropdown align="end">
+            <Dropdown.Toggle variant="link" className="text-white dropdown-toggle-no-arrow">
+              <FaUser className="me-2" size={30} />
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+              <Dropdown.Item as={Link} to="/vendorsettings"><FaCog className="me-2" /> Settings</Dropdown.Item>
+              <Dropdown.Item as={Link} to="/vendorlogout"><FaSignOutAlt className="me-2" /> Logout</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </Nav>
+      </Navbar>
+
+      <Row>
+        {/* Sidebar */}
+        <Col
+          lg={2}
+          className={`sidebar bg-dark text-white p-3 d-lg-block ${sidebarOpen ? "sidebar-open" : ""}`}
+          style={{
+            minHeight: "100vh",
+            position: "fixed",
+            zIndex: 999,
+            top: "56px",
+            left: sidebarOpen ? 0 : "-250px",
+            transition: "left 0.3s ease",
+          }}
+        >
+          <ListGroup variant="flush">
+            <ListGroup.Item className="bg-dark text-white border-0 d-flex align-items-center">
+              <FaTachometerAlt className="me-2" />
+              <Link to="/vendor/dashboard" className="sidebar-link">Dashboard</Link>
+            </ListGroup.Item>
+
+            {/* Product Management */}
+            <ListGroup.Item onClick={toggleProductManagement} className="bg-dark text-white border-0 d-flex align-items-center">
+              <FaClipboardList className="me-2" /> Product Management
+            </ListGroup.Item>
+            {productManagementOpen && (
+              <>
+                <ListGroup.Item className="bg-dark text-white border-0 d-flex align-items-center">
+                  <FaPlus className="me-2" /><Link to="/vendor/add-product" className="sidebar-link">Add Product</Link>
+                </ListGroup.Item>
+                <ListGroup.Item className="bg-dark text-white border-0 d-flex align-items-center">
+                  <FaTag className="me-2" /><Link to="/vendor/coupons" className="sidebar-link">Coupons</Link>
+                </ListGroup.Item>
+              </>
+            )}
+
+            {/* More sections... */}
+          </ListGroup>
+        </Col>
+
+        {/* Main Content */}
+        <Col
+          lg={sidebarOpen ? 10 : 12}
+          className="p-4"
+          style={{
+            marginLeft: sidebarOpen ? "250px" : "0",
+            transition: "margin-left 0.3s ease",
+            padding: "20px 15px",
+          }}
+        >
+          <h3>Coupons</h3>
+
+          <Row className="mb-3 justify-content-end">
+            <Col xs="auto">
+              <Button variant="primary" onClick={() => setShowAddProductModal(true)}>
+                Add Coupon
+              </Button>
+            </Col>
+          </Row>
+
+          <Row className="mb-3 justify-content-between align-items-center">
+            <Col xs="auto">
+              <label className="me-2">Show</label>
+              <Form.Select
+                value={entries}
+                onChange={(e) => setEntries(Number(e.target.value))}
+                style={{ width: "100px" }}
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+              </Form.Select>
+              <label className="ms-2">Entries</label>
+            </Col>
+            <Col xs="auto">
+              <label className="me-2">Search:</label>
+              <Form.Control type="text" placeholder="Search" style={{ width: "150px" }} />
+            </Col>
+          </Row>
+
+          {/* Card Layout */}
+          <Row xs={1} sm={2} md={3} lg={4} className="g-4">
+            {displayedCoupons.map((coupon) => (
+              <Col key={coupon.id}>
+                <Card className="shadow-sm h-100">
+                  <Card.Img variant="top" src={coupon.image} style={{ height: "150px", objectFit: "cover" }} />
+                  <Card.Body className="d-flex flex-column justify-content-between">
+                    <div>
+                      <Card.Title>{coupon.name}</Card.Title>
+                      <Card.Text>
+                        <strong>Code:</strong> {coupon.code} <br />
+                        <strong>Amount:</strong> {coupon.amount} <br />
+                        <strong>Expiry:</strong> {coupon.expiryDate} <br />
+                        <strong>Status:</strong>{" "}
+                        <Form.Check
+                          type="switch"
+                          id={`status-${coupon.id}`}
+                          checked={coupon.status}
+                          readOnly
+                          label={coupon.status ? "Active" : "Inactive"}
+                        />
+                      </Card.Text>
+                    </div>
+                    <div className="d-flex justify-content-between mt-3">
+                      <Button variant="warning" size="sm"><FaPen /></Button>
+                      <Button variant="danger" size="sm"><FaTimes /></Button>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+
+          {/* Pagination */}
+          <Row className="mt-4 justify-content-between">
+            <Col xs="auto">
+              <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
+                Previous
+              </Button>
+            </Col>
+            <Col xs="auto" className="align-self-center">
+              Page {currentPage} of {totalPages}
+            </Col>
+            <Col xs="auto">
+              <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>
+                Next
+              </Button>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
+
+      {/* Modal for Adding Coupon */}
+      <Modal show={showAddProductModal} onHide={() => setShowAddProductModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Add New Coupon</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3">
+              <Form.Label>Product Name</Form.Label>
+              <Form.Control type="text" placeholder="Enter product name" />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Coupon Code</Form.Label>
+              <Form.Control type="text" placeholder="Enter coupon code" />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Amount Type</Form.Label>
+              <Form.Select value={amountType} onChange={handleAmountTypeChange}>
+                <option value="$">Dollar Amount ($)</option>
+                <option value="%">Percentage (%)</option>
+              </Form.Select>
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Amount</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder={`Enter amount in ${amountType}`}
+                value={amount}
+                onChange={handleAmountChange}
+                min="0"
+                max={amountType === "%" ? "100" : undefined}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Expiry Date</Form.Label>
+              <Form.Control type="date" />
+            </Form.Group>
+            <Button variant="primary" onClick={() => setShowAddProductModal(false)}>Save Coupon</Button>
+          </Form>
+        </Modal.Body>
+      </Modal>
+    </Container>
+  );
+}
+
+export default AddCoupons;
