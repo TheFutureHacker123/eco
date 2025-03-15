@@ -1,0 +1,29 @@
+npx create-react-app frontend
+npm start
+npm install react-bootstrap bootstrap
+import 'bootstrap/dist/css/bootstrap.min.css';
+npm install react-router-dom
+
+composer create-project --prefer-dist laravel/laravel backend "10.*"
+composer global require laravel/installer
+laravel new backend
+php artisan serve
+
+port=3307
+netstat -ano | findstr :3306
+taskkill /PID 4284 /F
+
+Pass123@#$
+
+
+
+vendor_name
+vendor_address
+vendor_city
+vendor_region
+vendor_phone
+vendor_unique_id
+id_front_side
+id_back_side
+
+personal_id
